@@ -357,16 +357,3 @@ ipc.on('handle-permission-request', function (e, args) {
   }
 })
 
-ipc.on('permissionGranted', function (e, permissionId) {
-  for (var i = 0; i < pendingPermissions.length; i++) {
-    if (permissionId && pendingPermissions[i].permissionId === permissionId) {
-      pendingPermissions[i].granted = true
-      pendingPermissions[i].callback(true)
-      grantedPermissions.push(pendingPermissions[i])
-      pendingPermissions.splice(i, 1)
-
-      sendPermissionsToRenderers()
-      break
-    }
-  }
-})
