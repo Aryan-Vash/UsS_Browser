@@ -1,3 +1,7 @@
+const { app, session, ipcMain, net } = require('electron')
+const ipc = ipcMain
+// Min often aliases ipcMain as 'ipc', so define it to support your existing 'ipc.on' code
+const ipc = ipcMain
 var pendingPermissions = []
 var grantedPermissions = []
 var nextPermissionId = 1
@@ -6,7 +10,61 @@ var nextPermissionId = 1
 All permission requests are given to the renderer on each change,
 it will figure out what updates to make
 */
+ipcMain.handle('explain-permission', async (event, { permission, url }) => {
+  return new Promise((resolve, reject) => {
+    const request = net.request({
+      method: 'POST',
+      protocol: 'http:',
+      hostname: '127.0.0.1',
+      port: 8000,
+      path: '/explain%20permission/', // Matches path('explain permission/', ...)
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
 
+    request.on('response', (response) => {
+      let data = '';
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      response.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          
+          // --- FIX 1: Match the Output Key from views.py ---
+          // Your Python returns: combined["natural_language_summary"]
+          if (json.natural_language_summary) {
+             resolve(json.natural_language_summary);
+          } else if (json.error) {
+             console.warn('API returned error:', json.error);
+             resolve("Security analysis unavailable: " + json.error);
+          } else {
+             resolve("No explanation provided by security service.");
+          }
+        } catch (e) {
+          console.error('API Parse Error:', e);
+          resolve('Failed to process security report.');
+        }
+      });
+    });
+
+    request.on('error', (error) => {
+      console.error('API Request Error:', error);
+      resolve('Unable to connect to security analysis service.');
+    });
+
+    // --- FIX 2: Match the Input Keys expected by views.py ---
+    // Your Python expects: payload.get("url") and payload.get("permissions")
+    request.write(JSON.stringify({
+      permissions: permission, // Python expects "permissions" (plural)
+      url: url                 // Python expects "url"
+    }));
+    
+    request.end();
+  });
+});
 function sendPermissionsToRenderers () {
   //send all requests to all windows - the tab bar in each will figure out what to display
   windows.getAll().forEach(function(win) {
@@ -299,53 +357,7 @@ ipc.on('handle-permission-request', function (e, args) {
     console.warn('[DEBUG] WARNING: "handle-permission-request" was received, but NO matching permissionId was found in pendingPermissions.')
   }
 })
-ipcMain.handle('explain-permission', async (event, { permission, url }) => {
-  return new Promise((resolve, reject) => {
-    // API Endpoint from your screenshots
-    // Ensure the URL matches your running Django server
-    const request = net.request({
-      method: 'POST',
-      protocol: 'http:',
-      hostname: '127.0.0.1', // or your server IP
-      port: 8000,            // or your server port
-      path: '/explain%20permission/', // 'explain permission/' encoded
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
 
-    request.on('response', (response) => {
-      let data = '';
-      response.on('data', (chunk) => {
-        data += chunk;
-      });
-      response.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          // Assuming your views.py returns a JSON with an 'explanation' key
-          // Adjust 'explanation' to match the exact key from your API response
-          resolve(json.explanation || json.message || 'No explanation provided.');
-        } catch (e) {
-          console.error('API Parse Error:', e);
-          resolve('Failed to parse permission explanation.');
-        }
-      });
-    });
-
-    request.on('error', (error) => {
-      console.error('API Request Error:', error);
-      resolve('Unable to fetch permission explanation.');
-    });
-
-    // Send the payload expected by your testclient
-    request.write(JSON.stringify({
-      permission: permission,
-      url: url // or 'origin', match this key with your views.py expectation
-    }));
-    
-    request.end();
-  });
-});
 ipc.on('permissionGranted', function (e, permissionId) {
   for (var i = 0; i < pendingPermissions.length; i++) {
     if (permissionId && pendingPermissions[i].permissionId === permissionId) {
