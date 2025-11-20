@@ -167,6 +167,7 @@ require('bookmarkConverter.js').initialize()
 require('newTabPage.js').initialize()
 require('macHandoff.js').initialize()
 require('securityReport.js').init()
+require('navbar/linkHighlighterToggle.js').initialize()
 console.log('DEBUG: default.js is trying to load cookieManagerIcon.js')
 require('js/navbar/cookieManagerIcon.js').initialize()
 // default searchbar plugins
