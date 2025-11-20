@@ -9,21 +9,28 @@ const securityReport = {
         if (tabEditorInput && tabEditorInput.value) {
             return tabEditorInput.value;
         }
-        // Fallback for demonstration if the editor input is not available/visible
         return 'https://www.example-secure-site.com';
     },
 
     setLoadingState: (isLoading) => {
         securityReport.requestInFlight = isLoading
-        const elStatus = document.getElementById('report-status')
-        const elSummary = document.getElementById('report-summary')
-        if (isLoading) {
-            if (elStatus) elStatus.textContent = 'Fetching security report…'
-            if (elSummary) elSummary.textContent = 'Please wait while we analyze this site.'
+        
+        const elLoading = document.getElementById('security-report-loading')
+        const elContent = document.getElementById('security-report-content')
+        
+        if (elLoading && elContent) {
+            if (isLoading) {
+                elLoading.hidden = false;
+                elContent.hidden = true;
+            } else {
+                elLoading.hidden = true;
+                elContent.hidden = false;
+            }
         }
     },
 
     renderReport: async (url) => {
+        // 1. Show loading state immediately
         securityReport.setLoadingState(true)
 
         const elUrl = document.getElementById('report-url')
@@ -31,11 +38,15 @@ const securityReport = {
         const elSummary = document.getElementById('report-summary')
         const elModel = document.getElementById('report-model')
 
+        // Reset UI content
         if (elUrl) elUrl.textContent = url
         if (elModel) elModel.textContent = ''
+        if (elStatus) elStatus.textContent = '' 
+        if (elSummary) elSummary.textContent = ''
 
         try {
             const reportData = await ipcRenderer.invoke('security-report-fetch', url)
+            
             const modelPrediction = reportData?.model?.prediction?.[0] || {}
             const combined = reportData?.combined || {}
 
@@ -68,32 +79,25 @@ const securityReport = {
             securityReport.setLoadingState(false)
         }
     },
-
-    // Initialization and event setup
+    
     init: () => {
         const reportButton = document.getElementById('security-report-button');
         const reportDialog = document.getElementById('security-report-dialog');
         const closeButton = document.getElementById('security-report-close');
 
         if (!reportButton || !reportDialog || !closeButton) {
-            // Elements not present — nothing to initialize
             return
         }
-
-        // Event listener to open the modal
-        reportButton.addEventListener('click', async () => {
+        reportButton.addEventListener('click', () => {
             const currentURL = securityReport.getCurrentURL();
-            await securityReport.renderReport(currentURL);
-            
-            // Use the standard Min modal helper if available, otherwise use basic DOM show/hide
             if (typeof modalMode !== 'undefined' && modalMode.show) {
                 modalMode.show(reportDialog);
             } else {
                 reportDialog.hidden = false;
             }
-        });
 
-        // Event listener to close the modal
+            securityReport.renderReport(currentURL);
+        });
         closeButton.addEventListener('click', () => {
             if (typeof modalMode !== 'undefined' && modalMode.hide) {
                 modalMode.hide(reportDialog);
