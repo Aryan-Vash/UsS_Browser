@@ -540,6 +540,11 @@ ipc.on('analyze-url', (event, { url, channel }) => {
     })
 })
 
+ipc.handle('link-highlighter-get-state', () => {
+  const stored = settings.get('linkHighlighterEnabled')
+  return stored === undefined ? true : Boolean(stored)
+})
+
 ipc.handle('security-report-fetch', async (event, url) => {
   const endpoint = `https://mounts-vhs-homeless-brass.trycloudflare.com/explain_url/${encodeURIComponent(url)}`
   console.log(`[MainProcess] Fetching security report for ${url} via ${endpoint}`)
