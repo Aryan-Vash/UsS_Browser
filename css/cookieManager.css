@@ -1,0 +1,53 @@
+/* In css/cookieManager.css */
+
+/* This is a basic structure. Start by copying an existing overlay CSS */
+.cookie-manager-overlay {
+  position: fixed;
+  top: 50px; /* Adjust as needed */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 450px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--color-background-base);
+  border: 1px solid var(--color-border-base);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px var(--color-shadow-base);
+  z-index: 1001;
+  padding: 12px;
+}
+
+.cookie-manager-overlay h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  color: var(--color-text-base);
+}
+
+.cookie-manager-overlay .cookie-list {
+  font-size: 12px;
+  max-height: 150px;
+  overflow-y: auto;
+  background: var(--color-background-input);
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.cookie-manager-overlay .cookie-item {
+  display: block;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cookie-manager-overlay .buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* You will need to style your buttons */
+.cookie-manager-overlay .clear-button {
+  margin-left: 8px;
+}

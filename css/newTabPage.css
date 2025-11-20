@@ -1,0 +1,127 @@
+#ntp-content {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    opacity: 1;
+    transition: 0.15s opacity;
+    overflow: hidden;
+
+    /* --- ADDED --- */
+    /* This sets the background for the page *behind* the searchbar */
+    background-image: url('../pages/newtab/images/mainpage.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* --- END OF ADDED --- */
+    
+}
+
+body:not(.is-ntp) #ntp-content {
+    opacity: 0;
+}
+
+#ntp-background {
+    /*max-height: max(100%, 72vw);*/
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    object-fit: cover;
+}
+
+#ntp-background-controls {
+    position: absolute;
+    bottom: 1em;
+    right: 1.25em;
+}
+
+#ntp-background-controls button {
+    background: white;
+    border: 1px #aaa solid;
+    color: #444;
+    font-size: 1.15em;
+    width: 2em;
+    height: 2em;
+    line-height: 2em;
+    border-radius: 50%;
+    opacity: 0.7;
+    transition: 0.15s;
+}
+
+.dark-mode #ntp-background-controls button {
+    background: rgb(33, 37, 43);
+    border-color: #aaa;
+    color: white;
+}
+
+#ntp-background-controls:hover button {
+    opacity: 0.9;
+    box-shadow: 0px 3px 6px rgb(0, 0, 0, 0.25);
+}
+
+#ntp-background-controls:hover #ntp-image-remove {
+    color: rgb(248, 73, 73) !important;
+}
+
+#ntp-background-controls:not(:hover) #ntp-image-remove {
+    opacity: 0;
+}
+
+/*
+========================================
+  NEW STYLES FOR POPULAR SITES
+========================================
+*/
+
+.popular-sites-container {
+  text-align: center;
+  position: relative;
+  z-index: 10; /* Keeps it above the background controls */
+
+  /* This is the "frosted glass" box from your screenshot */
+  background-color: rgba(0, 0, 0, 0.25);
+  padding: 24px 32px;
+  border-radius: 16px;
+
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popular-sites-title {
+  font-size: 1.4em;
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.popular-sites-icons {
+  display: flex;
+  gap: 22px; /* Space between icons */
+  justify-content: center;
+}
+
+.popular-site-link {
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease-in-out;
+}
+
+.popular-site-link:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.popular-site-link img {
+  width: 80px;
+  height: 80px;
+  display: block;
+  /* This gives the icons a white background 
+     as seen in the mockup */
+  background-color: white;
+  border-radius: 20px;
+}
