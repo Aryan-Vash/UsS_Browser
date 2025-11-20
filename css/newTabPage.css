@@ -74,20 +74,21 @@ body:not(.is-ntp) #ntp-content {
 ========================================
 */
 
+/* 
 .popular-sites-container {
   text-align: center;
   position: relative;
   z-index: 10; /* Keeps it above the background controls */
 
-  /* This is the "frosted glass" box from your screenshot */
-  background-color: rgba(0, 0, 0, 0.25);
+   /* This is the "frosted glass" box from your screenshot */
+  /* background-color: rgba(0, 0, 0, 0.25);
   padding: 24px 32px;
   border-radius: 16px;
 
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
+  border: 1px solid rgba(255, 255, 255, 0.1); */
+/* }
 
 .popular-sites-title {
   font-size: 1.4em;
@@ -101,7 +102,7 @@ body:not(.is-ntp) #ntp-content {
 .popular-sites-icons {
   display: flex;
   gap: 22px; /* Space between icons */
-  justify-content: center;
+  /* justify-content: center;
 }
 
 .popular-site-link {
@@ -119,9 +120,9 @@ body:not(.is-ntp) #ntp-content {
 .popular-site-link img {
   width: 80px;
   height: 80px;
-  display: block;
+  display: block; */
   /* This gives the icons a white background 
      as seen in the mockup */
-  background-color: white;
-  border-radius: 20px;
-}
+  /* background-color: white;
+  border-radius: 20px; */
+/* } */
