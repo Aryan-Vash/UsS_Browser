@@ -6,6 +6,7 @@ var nextPermissionId = 1
 All permission requests are given to the renderer on each change,
 it will figure out what updates to make
 */
+
 function sendPermissionsToRenderers () {
   //send all requests to all windows - the tab bar in each will figure out what to display
   windows.getAll().forEach(function(win) {
@@ -298,6 +299,53 @@ ipc.on('handle-permission-request', function (e, args) {
     console.warn('[DEBUG] WARNING: "handle-permission-request" was received, but NO matching permissionId was found in pendingPermissions.')
   }
 })
+ipcMain.handle('explain-permission', async (event, { permission, url }) => {
+  return new Promise((resolve, reject) => {
+    // API Endpoint from your screenshots
+    // Ensure the URL matches your running Django server
+    const request = net.request({
+      method: 'POST',
+      protocol: 'http:',
+      hostname: '127.0.0.1', // or your server IP
+      port: 8000,            // or your server port
+      path: '/explain%20permission/', // 'explain permission/' encoded
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    request.on('response', (response) => {
+      let data = '';
+      response.on('data', (chunk) => {
+        data += chunk;
+      });
+      response.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          // Assuming your views.py returns a JSON with an 'explanation' key
+          // Adjust 'explanation' to match the exact key from your API response
+          resolve(json.explanation || json.message || 'No explanation provided.');
+        } catch (e) {
+          console.error('API Parse Error:', e);
+          resolve('Failed to parse permission explanation.');
+        }
+      });
+    });
+
+    request.on('error', (error) => {
+      console.error('API Request Error:', error);
+      resolve('Unable to fetch permission explanation.');
+    });
+
+    // Send the payload expected by your testclient
+    request.write(JSON.stringify({
+      permission: permission,
+      url: url // or 'origin', match this key with your views.py expectation
+    }));
+    
+    request.end();
+  });
+});
 ipc.on('permissionGranted', function (e, permissionId) {
   for (var i = 0; i < pendingPermissions.length; i++) {
     if (permissionId && pendingPermissions[i].permissionId === permissionId) {
