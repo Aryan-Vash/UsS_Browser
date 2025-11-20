@@ -3,6 +3,9 @@
 const { ipcRenderer } = require('electron')
 
 const processedLinks = new WeakSet()
+let highlightEnabled = true
+let bootstrapped = false
+let observerStarted = false
 
 function clamp (value, min, max) {
   return Math.min(Math.max(value, min), max)
@@ -38,8 +41,30 @@ function probabilityToColor (rawProbability) {
   return '#ff0000' // red
 }
 
+function clearHighlights () {
+  const links = document.querySelectorAll ? document.querySelectorAll('a') : []
+  links.forEach(link => {
+    link.style.color = ''
+    delete link.dataset.riskProbability
+    processedLinks.delete(link)
+  })
+}
+
+function setHighlightingEnabled (enabled) {
+  const normalized = enabled !== false
+  if (highlightEnabled === normalized) {
+    return
+  }
+  highlightEnabled = normalized
+  if (!highlightEnabled) {
+    clearHighlights()
+  } else if (bootstrapped) {
+    highlightLinks()
+  }
+}
+
 function analyzeLink (link) {
-  if (!link || processedLinks.has(link)) {
+  if (!highlightEnabled || !link || processedLinks.has(link)) {
     return
   }
 
@@ -89,6 +114,9 @@ function analyzeLink (link) {
 }
 
 function highlightLinks (root = document) {
+  if (!highlightEnabled) {
+    return
+  }
   const scope = root.querySelectorAll ? root.querySelectorAll('a') : []
   scope.forEach(analyzeLink)
 }
@@ -97,6 +125,11 @@ function startObserving () {
   if (!document.body) {
     return
   }
+
+  if (observerStarted) {
+    return
+  }
+  observerStarted = true
 
   const observer = new MutationObserver(mutations => {
     mutations.forEach(mutation => {
@@ -119,12 +152,35 @@ function startObserving () {
   })
 }
 
-if (document.readyState === 'complete') {
-  highlightLinks()
-  startObserving()
-} else {
-  window.addEventListener('load', () => {
-    highlightLinks()
+function bootHighlighting () {
+  if (bootstrapped) {
+    return
+  }
+  bootstrapped = true
+
+  const start = () => {
+    if (highlightEnabled) {
+      highlightLinks()
+    }
     startObserving()
-  })
+  }
+
+  if (document.readyState === 'complete') {
+    start()
+  } else {
+    window.addEventListener('load', start)
+  }
 }
+
+ipcRenderer.on('link-highlighter-toggle', (event, enabled) => {
+  setHighlightingEnabled(enabled)
+})
+
+ipcRenderer.invoke('link-highlighter-get-state')
+  .then(value => {
+    setHighlightingEnabled(value)
+    bootHighlighting()
+  })
+  .catch(() => {
+    bootHighlighting()
+  })
