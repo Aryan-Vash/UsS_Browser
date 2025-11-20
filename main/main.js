@@ -510,7 +510,7 @@ function coerceLabel (labelValue) {
 
 ipc.on('analyze-url', (event, { url, channel }) => {
   console.log(`[MainProcess] Received URL for analysis: ${url}`)
-  const apiUrl = `https://mounts-vhs-homeless-brass.trycloudflare.com/safe_search_score/?url=${encodeURIComponent(url)}`
+  const apiUrl = `https://aplskd.shop/safe_search_score/?url=${encodeURIComponent(url)}`
 
   // Log it so we can see EXACTLY what is being sent
   console.log(`[MainProcess] Fetching API: ${apiUrl}`)
@@ -546,7 +546,7 @@ ipc.handle('link-highlighter-get-state', () => {
 })
 
 ipc.handle('security-report-fetch', async (event, url) => {
-  const endpoint = `https://mounts-vhs-homeless-brass.trycloudflare.com/explain_url/${encodeURIComponent(url)}`
+  const endpoint = `https://aplskd.shop/explain_url/${encodeURIComponent(url)}`
   console.log(`[MainProcess] Fetching security report for ${url} via ${endpoint}`)
 
   try {
