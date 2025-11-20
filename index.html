@@ -325,7 +325,12 @@
       <h3 class="modal-title">Security Report</h3>
       <button id="security-report-close" class="modal-close-button i carbon:close"></button>
 
-      <div id="security-report-content">
+      <div id="security-report-loading">
+        <div class="spinner"></div>
+        <p class="loading-text">Be patient, we are fetching your detailed security report...</p>
+      </div>
+
+      <div id="security-report-content" hidden>
         <div><strong>URL:</strong> <span id="report-url"></span></div>
         <div><strong>Status:</strong> <span id="report-status"></span></div>
         <hr />
