@@ -1,7 +1,6 @@
 const { app, session, ipcMain, net } = require('electron')
 const ipc = ipcMain
 // Min often aliases ipcMain as 'ipc', so define it to support your existing 'ipc.on' code
-const ipc = ipcMain
 var pendingPermissions = []
 var grantedPermissions = []
 var nextPermissionId = 1
